@@ -1,3 +1,4 @@
+flask
 aiohttp-requests<=0.1.2
 aiohttp<=3.0.1
 aiokafka<=0.5.0
