@@ -31,8 +31,7 @@ def _proxy(*args, **kwargs):
 
     return (resp.content, resp.status_code, headers)
 
-@app.route('/topics/<string:topic>',methods=['POST'])
-def topics_post(topic):
+def direct_publish(topic):
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
     request.on_json_loading_failed = lambda e: ({"error":f"Request data is not good JSON - {e}"})
     payload = request.get_json()
@@ -45,8 +44,14 @@ def topics_post(topic):
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def proxy(path):
-    print("Proxying the request")
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
+    if request.method == 'POST':
+      toks = path.split('/')
+      if len(toks) == 2:
+        LOGGER.info("serving Publish Request")
+        topic = toks[1]
+        return direct_publish(topic)
+
     content,status_code,headers = _proxy()
     print(content,status_code,headers)
     response = Response(content, status_code, headers)
