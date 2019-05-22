@@ -3,6 +3,9 @@ import requests
 import kafka_client
 import json
 import sys
+import logging
+
+LOGGER = logging.getLogger(__file__)
 
 
 APP_CONFIG_FILE = '/appcfg/rest_service_config.json'
@@ -44,7 +47,7 @@ def topics_post(topic):
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def proxy(path):
-    print('hi')
+    print("Proxying the request")
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
     content,status_code,headers = _proxy()
     print(content,status_code,headers)
@@ -52,5 +55,5 @@ def proxy(path):
     return response
 
 if __name__ == '__main__':
-  print('listening')
+  logging.basicConfig(level=logging.INFO)
   app.run(host='0.0.0.0', port=8080)
