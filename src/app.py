@@ -31,10 +31,12 @@ def _proxy(*args, **kwargs):
 
     return (resp.content, resp.status_code, headers)
 
-def direct_publish(topic):
+@app.route('/topics/<string:topic>',methods=['POST'])
+def topics_post(topic):
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
     request.on_json_loading_failed = lambda e: ({"error":f"Request data is not good JSON - {e}"})
     payload = request.get_json()
+    LOGGER.info(f"payload - {payload}")
     records = payload['records']
     headers = dict(remote_ip=request.remote_addr)
     responses = _KafkaProducer.send_records(topic,records,headers)
@@ -45,13 +47,6 @@ def direct_publish(topic):
 @app.route('/<path:path>')
 def proxy(path):
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
-    if request.method == 'POST':
-      toks = path.split('/')
-      if len(toks) == 2:
-        LOGGER.info("serving Publish Request")
-        topic = toks[1]
-        return direct_publish(topic)
-
     content,status_code,headers = _proxy()
     print(content,status_code,headers)
     response = Response(content, status_code, headers)
