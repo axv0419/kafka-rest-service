@@ -35,8 +35,9 @@ def _proxy(*args, **kwargs):
 def topics_post(topic):
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
     request.on_json_loading_failed = lambda e: ({"error":f"Request data is not good JSON - {e}"})
+    is_json = request.is_json()
     payload = request.get_json()
-    LOGGER.info(f"payload - {payload}")
+    LOGGER.info(f"payload -{is_json} {payload} ")
     records = payload['records']
     headers = dict(remote_ip=request.remote_addr)
     responses = _KafkaProducer.send_records(topic,records,headers)
