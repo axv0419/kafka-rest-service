@@ -5,30 +5,12 @@ import aiohttp
 from flask import Flask, current_app,Response
 
 from flask_aiohttp import AioHTTP
-from flask_aiohttp.helper import async, websocket
 
 app = Flask(__name__)
 
 aio = AioHTTP(app)
 
 REST_SERVICE_HOST_PORT = sys.environ['REST_SERVICE_HOST_PORT']
-
-
-@app.route('/echo')
-@websocket
-def echo():
-    while True:
-        msg = yield from aio.ws.receive_msg()
-
-        if msg.tp == aiohttp.MsgType.text:
-            aio.ws.send_str(msg.data)
-        elif msg.tp == aiohttp.MsgType.close:
-            print('websocket connection closed')
-            break
-        elif msg.tp == aiohttp.MsgType.error:
-            print('ws connection closed with exception %s',
-                  aio.ws.exception())
-            break
 
 
 @async
