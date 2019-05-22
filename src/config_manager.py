@@ -3,7 +3,7 @@ import os
 APP_CONFIG_FILE = '/appcfg/rest_service_config.json'
 def _get_config():
     with open(APP_CONFIG_FILE) as f:
-    config = json.load(f)
+        config = json.load(f)
     return config
 
 
