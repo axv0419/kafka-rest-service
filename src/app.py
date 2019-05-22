@@ -4,13 +4,11 @@ import kafka_client
 import json
 import sys
 import logging
-
+import config_manager
 LOGGER = logging.getLogger(__file__)
 
 
-APP_CONFIG_FILE = '/appcfg/rest_service_config.json'
-with open(APP_CONFIG_FILE) as f:
-  APP_CONFIG = json.load(f)
+APP_CONFIG = config_manager.get_config()
 
 _KafkaProducer = kafka_client.KafkaProducer(APP_CONFIG['kafka_config'])
 rest_url_base = APP_CONFIG['rest_proxy']['url']

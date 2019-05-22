@@ -1,0 +1,12 @@
+version: '2'
+services:
+  kafka-rest-service:
+    image: kafka/rest-service
+    build: ./kafka-rest-service
+    hostname: kafka-rest-service
+    container_name: kafka-rest-service
+    ports:
+      - 8080:8080
+    volumes:
+      - ./kafka-rest-service/appcfg:/appcfg
+      - ./kafka-rest-service/src:/app

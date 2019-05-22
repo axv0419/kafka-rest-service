@@ -14,7 +14,6 @@ import logging
 LOGGER = logging.getLogger(__file__)
 
 
-
 class KafkaProducer:
     def __init__(self,conf):
         self.producer = Producer(conf)
