@@ -1,0 +1,6 @@
+{
+    "kafka_config" :{
+
+    },
+    "rest_backend":{"host_port" :"172.26.0.6:8082"}
+}
