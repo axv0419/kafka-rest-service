@@ -10,6 +10,6 @@ docker build -t kafka/rest-service .
 docker run --rm -d \
     -v $(pwd)/src:/app \
     -v $(pwd)/appcfg:/appcfg \
-    -p 5000:5000 \
+    -p 8080:8080 \
     kafka/rest-service
 ```
