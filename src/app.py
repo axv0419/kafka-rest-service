@@ -10,7 +10,7 @@ with open(APP_CONFIG_FILE) as f:
   APP_CONFIG = json.load(f)
 
 _KafkaProducer = kafka_client.KafkaProducer(APP_CONFIG['kafka_config'])
-REST_BACKEND_HOST_PORT = APP_CONFIG['rest_proxy']['host_port']
+rest_url_base = APP_CONFIG['rest_proxy']['url']
 
 app = Flask(__name__)
 
@@ -18,7 +18,7 @@ app = Flask(__name__)
 def _proxy(*args, **kwargs):
     resp = requests.request(
         method=request.method,
-        url=request.url.replace(request.host_url, REST_BACKEND_HOST_PORT),
+        url=request.url.replace(request.host_url, rest_url_base),
         headers={key: value for (key, value) in request.headers if key != 'Host'},
         data= kwargs.get('data', request.get_data()),
         cookies=request.cookies,
