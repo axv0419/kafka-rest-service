@@ -1,6 +1,18 @@
 {
-    "kafka_config" :{
-
+    "kafka_config": {
+        "bootstrap.servers": "pkc-xxxxxxx.europe-west3.gcp.confluent.cloud:9092",
+        "broker.version.fallback": "0.10.0.0",
+        "api.version.fallback.ms": 0,
+        "security.protocol": "SASL_SSL",
+        "sasl.mechanisms": "PLAIN",
+        "sasl.username": "xxx",
+        "debug": "all",
+        "sasl.password": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
     },
-    "rest_backend":{"host_port" :"172.26.0.6:8082"}
+    "schema_registry": {
+        "url": "http://35.246.229.124:8085"
+    },
+    "rest_proxy": {
+        "host_port": "172.26.0.6:8082"
+    }
 }
