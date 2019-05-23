@@ -17,6 +17,7 @@ LOGGER = logging.getLogger(__file__)
 class KafkaProducer:
     def __init__(self,conf):
         self.producer = Producer(conf)
+        LOGGER.info(f"Started Producer with config - {conf}")
     def send_records(self,topic,records,headers):
         responses = []
         def delivery_report(err, msg):
