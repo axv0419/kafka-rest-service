@@ -16,7 +16,7 @@ def get_config():
             "security.protocol": "SASL_SSL",
             "sasl.mechanisms": "PLAIN",
             "sasl.username": os.environ["CCLOUD_API_KEY"],
-            # "debug": "all",
+            "debug": "all",
             "sasl.password": os.environ["CCLOUD_API_SECRET"]
         },
         "schema_registry": {
