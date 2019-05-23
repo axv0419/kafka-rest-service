@@ -40,7 +40,7 @@ class KafkaProducer:
             self.producer.produce(topic, data, key=key, callback=delivery_report,headers=headers)
             self.producer.poll(.5)
         LOGGER.info("-----before flush")
-        self.producer.flush()
+        self.producer.flush(3)
         LOGGER.info(f"Responses - {responses}")
         return responses
 
