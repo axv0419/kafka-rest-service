@@ -3,7 +3,6 @@ FROM python:3.6
 
 RUN mkdir -p /tmp && mkdir -p /app
 COPY ./requirements.txt /tmp
-ADD ./src ./app
 RUN pip install -r /tmp/requirements.txt
 WORKDIR /app
 
