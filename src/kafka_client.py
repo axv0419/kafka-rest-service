@@ -41,6 +41,7 @@ class KafkaProducer:
         except:
             traceback.print_exc()
         self.producer.flush()
+        LOGGER.debug(f"Responses - {responses}")
         return responses
 
 if __name__ == '__main__':
