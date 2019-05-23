@@ -28,7 +28,8 @@ class KafkaProducer:
                 LOGGER.debug('Message delivered {} {} {} [{}] {}'.format( msg.timestamp(),msg.offset(), msg.topic(), msg.partition(), msg.key()))
 
             response=dict(error = f"{err}" if err else None, 
-                report=dict(timestamp=msg.timestamp()[1],partition=msg.partition(),offset=msg.offset(),key=msg.key()))
+                report=dict(timestamp=msg.timestamp()[1],partition=msg.partition(),\
+                    offset=msg.offset(),key=msg.key().encode('UTF-8')))
             responses.append(response)
  
         for record in records:
