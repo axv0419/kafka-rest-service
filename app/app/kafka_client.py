@@ -36,13 +36,16 @@ class KafkaProducer:
         for record in records:
             data = json.dumps(record["value"])
             key = record.get('key')
+            LOGGER.info("-----a")
             self.producer.produce(topic, data, key=key, callback=delivery_report,headers=headers)
+            LOGGER.info("-----b")
+        self.producer.flush()
         
         try:
-            self.producer.poll(0)
+            LOGGER.info("Polling for responses")
+            self.producer.poll(1.0)
         except:
             traceback.print_exc()
-        self.producer.flush()
         LOGGER.info(f"Responses - {responses}")
         return responses
 
