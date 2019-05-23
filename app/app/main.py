@@ -4,8 +4,7 @@ import json
 import sys
 import logging
 
-import app.kafka_client
-import app.config_manager
+from . import kafka_client,config_manager
 
 app = Flask(__name__)
 
