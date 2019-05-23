@@ -39,7 +39,6 @@ class KafkaProducer:
             LOGGER.info("-----a")
             self.producer.produce(topic, data, key=key, callback=delivery_report,headers=headers)
             LOGGER.info("-----b")
-        # self.producer.flush()
         
         try:
             LOGGER.info("Polling for responses")
@@ -47,6 +46,7 @@ class KafkaProducer:
         except:
             traceback.print_exc()
         LOGGER.info(f"Responses - {responses}")
+        self.producer.flush()
         return responses
 
 if __name__ == '__main__':
