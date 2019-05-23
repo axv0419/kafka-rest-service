@@ -6,7 +6,7 @@ import logging
 
 from . import kafka_client,config_manager
 
-app = Flask(__name__)
+application = app = Flask(__name__)
 
 LOGGER = logging.getLogger(__file__)
 
