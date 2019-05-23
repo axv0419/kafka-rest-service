@@ -7,6 +7,8 @@ import logging
 import app.kafka_client
 import app.config_manager
 
+app = Flask(__name__)
+
 LOGGER = logging.getLogger(__file__)
 
 def _proxy(*args, **kwargs):
@@ -53,7 +55,6 @@ APP_CONFIG = config_manager.get_config()
 _KafkaProducer = kafka_client.KafkaProducer(APP_CONFIG['kafka_config'])
 rest_url_base = APP_CONFIG['rest_proxy']['url']
 
-app = Flask(__name__)
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO)
