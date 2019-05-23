@@ -4,8 +4,8 @@ import json
 import sys
 import logging
 
-import .kafka_client
-import .config_manager
+import kafka_client
+import config_manager
 
 LOGGER = logging.getLogger(__file__)
 
