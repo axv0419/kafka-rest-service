@@ -6,7 +6,7 @@ services:
     hostname: kafka-rest-service
     container_name: kafka-rest-service
     ports:
-      - 8080:8080
+      - 8080:80
     volumes:
       - ./kafka-rest-service/appcfg:/appcfg
       - ./kafka-rest-service/src:/app

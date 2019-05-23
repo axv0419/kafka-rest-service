@@ -1,10 +1,11 @@
 from flask import Flask,request, Response
 import requests
-import kafka_client
 import json
 import sys
 import logging
-import config_manager
+
+import .kafka_client
+import .config_manager
 LOGGER = logging.getLogger(__file__)
 
 
@@ -12,9 +13,6 @@ APP_CONFIG = config_manager.get_config()
 
 _KafkaProducer = kafka_client.KafkaProducer(APP_CONFIG['kafka_config'])
 rest_url_base = APP_CONFIG['rest_proxy']['url']
-
-app = Flask(__name__)
-
 
 def _proxy(*args, **kwargs):
     resp = requests.request(
