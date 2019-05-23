@@ -23,15 +23,15 @@ class KafkaProducer:
             """ Called once for each message produced to indicate delivery result.
                 Triggered by poll() or flush(). """
             if err is not None:
-                LOGGER.debug('Message delivery failed: {}'.format(err))
+                LOGGER.info('Message delivery failed: {}'.format(err))
             else:
-                LOGGER.debug('Message delivered {} {} {} [{}] {}'.format( msg.timestamp(),msg.offset(), msg.topic(), msg.partition(), msg.key()))
+                LOGGER.info('Message delivered {} {} {} [{}] {}'.format( msg.timestamp(),msg.offset(), msg.topic(), msg.partition(), msg.key()))
 
             response=dict(error = f"{err}" if err else None, 
                 report=dict(timestamp=msg.timestamp()[1],partition=msg.partition(),\
                     offset=msg.offset(),key=msg.key().decode('utf-8')))
             responses.append(response)
- 
+        LOGGER.info(f"sending records - {records}")
         for record in records:
             data = json.dumps(record["value"])
             key = record.get('key')
@@ -42,7 +42,7 @@ class KafkaProducer:
         except:
             traceback.print_exc()
         self.producer.flush()
-        LOGGER.debug(f"Responses - {responses}")
+        LOGGER.info(f"Responses - {responses}")
         return responses
 
 if __name__ == '__main__':

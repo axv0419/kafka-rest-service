@@ -7,10 +7,13 @@ docker build -t kafka/rest-service .
 
 
 ```bash
-docker run --rm -d \
+docker run --rm  \
     --name k-rst-svc \
-    -v $(pwd)/src:/app \
+    -e CCLOUD_BROKER_URL=$CCLOUD_BROKER_URL \
+    -e CCLOUD_API_KEY=$CCLOUD_API_KEY \
+    -e CCLOUD_API_SECRET=$CCLOUD_API_SECRET \
+    -v $(pwd)/app:/app \
     -v $(pwd)/appcfg:/appcfg \
-    -p 8080:8080 \
+    -p 7080:80 \
     kafka/rest-service
 ```

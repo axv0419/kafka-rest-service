@@ -9,7 +9,7 @@ services:
       - 8080:80
     volumes:
       - ./kafka-rest-service/appcfg:/appcfg
-      - ./kafka-rest-service/src:/app
+      - ./kafka-rest-service/app:/app
     environment:
       CCLOUD_BROKER_URL: $CCLOUD_BROKER_URL
       CCLOUD_API_KEY: $CCLOUD_API_KEY
