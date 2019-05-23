@@ -36,17 +36,11 @@ class KafkaProducer:
         for record in records:
             data = json.dumps(record["value"])
             key = record.get('key')
-            LOGGER.info("-----a")
             self.producer.produce(topic, data, key=key, callback=delivery_report,headers=headers)
-            LOGGER.info("-----b")
-        
-        try:
-            LOGGER.info("Polling for responses")
-            self.producer.poll(5.0)
-        except:
-            LOGGER.exception("Polling failed")
-        LOGGER.info(f"Responses - {responses}")
+            self.producer.poll(.5)
+        LOGGER.info("-----before flush")
         self.producer.flush()
+        LOGGER.info(f"Responses - {responses}")
         return responses
 
 if __name__ == '__main__':
