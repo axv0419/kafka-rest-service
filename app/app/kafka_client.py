@@ -42,9 +42,9 @@ class KafkaProducer:
         
         try:
             LOGGER.info("Polling for responses")
-            self.producer.poll(1.0)
+            self.producer.poll(5.0)
         except:
-            traceback.print_exc()
+            LOGGER.exception("Polling failed")
         LOGGER.info(f"Responses - {responses}")
         self.producer.flush()
         return responses
