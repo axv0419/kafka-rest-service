@@ -27,7 +27,7 @@ def _proxy(*args, **kwargs):
 
 
 @app.route('/offsets/<string:topic>',methods=['GET'])
-def topics_post(topic):
+def topic_offsets(topic):
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
     LOGGER.info(f"payload -{request.is_json} {payload} ")
     response_data = _KafkaConsumer.get_topic_offsets(topic)
