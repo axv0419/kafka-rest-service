@@ -62,7 +62,11 @@ class KafkaProducer:
             data = json.dumps(record["value"])
             key = record.get('key')
             partition = record.get('partition',None)
-
+            if partition:
+                try:
+                    partition = int(partition)
+                except:
+                    partition = 0
             if partition and partition.isnumeric():
                 partition = int(partition)
                 record_partition = partition_count % partition
