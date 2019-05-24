@@ -43,7 +43,7 @@ class KafkaProducer:
                 error = f"{err}" if err else None, 
                 status = "PRODUCER_ERROR" if err else "SUCCESS",
                 report=dict(timestamp=msg.timestamp()[1],partition=msg.partition(),\
-                    offset=msg.offset(),key=msg.key()))
+                    offset=msg.offset(),key=str(msg.key()))
             responses.append(response)
 
         partition_count = self.get_topic_partition_count(topic)
