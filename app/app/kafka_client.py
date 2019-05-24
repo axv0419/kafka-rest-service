@@ -67,8 +67,7 @@ class KafkaProducer:
                     partition = int(partition)
                 except:
                     partition = 0
-            if partition and partition.isnumeric():
-                partition = int(partition)
+            if partition:
                 record_partition = partition_count % partition
                 self.producer.produce(topic,value=data,partition=record_partition, key=key, callback=delivery_report,headers=headers)
             else:
