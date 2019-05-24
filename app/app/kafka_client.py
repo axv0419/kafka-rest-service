@@ -11,14 +11,24 @@ import argparse
 import traceback
 import logging
 
+from cachetools import cached, LRUCache, TTLCache
+
 LOGGER = logging.getLogger(__file__)
 
 
 class KafkaProducer:
     def __init__(self,conf):
         self.producer = Producer(conf)
-        # LOGGER.info(f"Started Producer with config - {conf}")
-        # resp = self.send_records('test',[{ "key": "somekey", "value": {"foo": "bar"}}],{})
+
+    @cached(cache=TTLCache(maxsize=1024, ttl=60))
+    def get_topic_partition_count(self,topic_name):
+        cmd = self.producer.list_topics(topic_name)
+        tmd = cmd.topics.get(topic_name,None)
+        pcount = 0
+        if tmd:
+            pcount = len(tmd.partitions)
+        return pcount
+
     def send_records(self,topic,records,headers):
         responses = []
         def delivery_report(err, msg):
@@ -35,13 +45,32 @@ class KafkaProducer:
                 report=dict(timestamp=msg.timestamp()[1],partition=msg.partition(),\
                     offset=msg.offset(),key=msg.key().decode('utf-8')))
             responses.append(response)
+
+        partition_count = self.get_topic_partition_count(topic)
+        if not partition_count:
+            LOGGER.warn(f"Requested topic {topic} does not exist")
+            responses = [dict(
+                error = f"Topic {topic} does not exist", 
+                status = "PRODUCER_ERROR" if err else "SUCCESS",
+                report= None)]
+            return responses
+
+
         LOGGER.info(f"sending records - {records}")
+
         for record in records:
             data = json.dumps(record["value"])
             key = record.get('key')
-            self.producer.produce(topic, data, key=key, callback=delivery_report,headers=headers)
-            self.producer.poll(.5)
-        self.producer.flush(3)
+            partition = record.get('partition',None)
+
+            if partition and partition.isnumeric():
+                partition = int(partition)
+                record_partition = partition_count % partition
+                self.producer.produce(topic,value=data,partition=record_partition, key=key, callback=delivery_report,headers=headers)
+            else:
+                self.producer.produce(topic, data, key=key, callback=delivery_report,headers=headers)
+            self.producer.poll(.01)
+        self.producer.flush()
         LOGGER.info(f"Responses - {responses}")
         return responses
 

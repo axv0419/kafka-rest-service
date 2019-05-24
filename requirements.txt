@@ -3,3 +3,4 @@ pyyaml
 confluent_kafka
 flask
 gunicorn
+cachetools
