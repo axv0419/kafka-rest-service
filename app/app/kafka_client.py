@@ -68,7 +68,7 @@ class KafkaProducer:
                 except:
                     partition = 0
             if partition:
-                record_partition = partition_count % partition
+                record_partition =  partition % partition_count
                 self.producer.produce(topic,value=data,partition=record_partition, key=key, callback=delivery_report,headers=headers)
             else:
                 self.producer.produce(topic, data, key=key, callback=delivery_report,headers=headers)
