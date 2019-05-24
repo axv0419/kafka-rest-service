@@ -30,7 +30,7 @@ class KafkaConsumer:
             pcount = len(tmd.partitions)
         return pcount
 
-    @cached(cache=TTLCache(maxsize=1024, ttl=60))
+    @cached(cache=TTLCache(maxsize=1024, ttl=10))
     def get_topic_offsets(self,topic_name,minutes=10):
         # timestamp = (datetime.now() - timedelta(minutes=minutes)).timestamp()
         # timestamp = int(timestamp)*1000
