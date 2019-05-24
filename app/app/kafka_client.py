@@ -51,7 +51,7 @@ class KafkaProducer:
             LOGGER.warn(f"Requested topic {topic} does not exist")
             responses = [dict(
                 error = f"Topic {topic} does not exist", 
-                status = "PRODUCER_ERROR" if err else "SUCCESS",
+                status = "PRODUCER_ERROR",
                 report= None)]
             return responses
 
