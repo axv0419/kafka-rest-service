@@ -39,11 +39,12 @@ class KafkaProducer:
             else:
                 LOGGER.info('Message delivered {} {} {} [{}] {}'.format( msg.timestamp(),msg.offset(), msg.topic(), msg.partition(), msg.key()))
 
+            keystr = None if err or not msg.key() else msg.key().decode('UTF-8') 
             response=dict(
                 error = f"{err}" if err else None, 
                 status = "PRODUCER_ERROR" if err else "SUCCESS",
                 report=dict(timestamp=msg.timestamp()[1],partition=msg.partition(),\
-                    offset=msg.offset(),key=str(msg.key()))
+                    offset=msg.offset(),key=keystr))
             responses.append(response)
 
         partition_count = self.get_topic_partition_count(topic)
