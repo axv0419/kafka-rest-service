@@ -29,7 +29,9 @@ class KafkaProducer:
             else:
                 LOGGER.info('Message delivered {} {} {} [{}] {}'.format( msg.timestamp(),msg.offset(), msg.topic(), msg.partition(), msg.key()))
 
-            response=dict(error = f"{err}" if err else None, 
+            response=dict(
+                error = f"{err}" if err else None, 
+                status = "PRODUCER_ERROR" if err else "SUCCESS",
                 report=dict(timestamp=msg.timestamp()[1],partition=msg.partition(),\
                     offset=msg.offset(),key=msg.key().decode('utf-8')))
             responses.append(response)
@@ -39,7 +41,6 @@ class KafkaProducer:
             key = record.get('key')
             self.producer.produce(topic, data, key=key, callback=delivery_report,headers=headers)
             self.producer.poll(.5)
-        LOGGER.info("-----before flush")
         self.producer.flush(3)
         LOGGER.info(f"Responses - {responses}")
         return responses
