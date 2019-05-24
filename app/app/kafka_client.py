@@ -4,17 +4,49 @@ import sys
 import yaml
 import json
 
-from confluent_kafka import Producer,Consumer,KafkaError
+from confluent_kafka import Producer,Consumer,KafkaError,TopicPartition
 
 from collections import defaultdict
 import argparse
 import traceback
 import logging
+from datetime import datetime, timedelta
 
 from cachetools import cached, LRUCache, TTLCache
 
 LOGGER = logging.getLogger(__file__)
 
+class KafkaConsumer:
+    def __init__(self,conf,group_id='kafka-rest-service'):
+        conf = dict(conf)
+        conf['group.id'] = group_id
+        self.consumer = Consumer(conf)
+    @cached(cache=TTLCache(maxsize=1024, ttl=60))
+    def get_topic_partition_count(self,topic_name):
+        cmd = self.consumer.list_topics(topic_name)
+        tmd = cmd.topics.get(topic_name,None)
+        pcount = 0
+        if tmd:
+            pcount = len(tmd.partitions)
+        return pcount
+
+    def get_topic_offsets(self,topic_name,minutes=10):
+        # timestamp = (datetime.now() - timedelta(minutes=minutes)).timestamp()
+        # timestamp = int(timestamp)*1000
+        pcount = self.get_topic_partition_count(topic_name)
+        if pcount == 0:
+            return dict(
+                error=f"Requested topic {topic_name} not found", 
+                status="ERROR",
+                report=None)
+        rval =[]
+        for p in range(pcount):
+            l,h = self.consumer.get_watermark_offsets(TopicPartition(topic_name,p))
+            rval.append(dict(partition=p,committed_offset=h,topic=topic_name))
+        return dict(
+            error=None, 
+            status="SUCCESS",
+            offsets=rval)
 
 class KafkaProducer:
     def __init__(self,conf):

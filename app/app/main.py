@@ -25,6 +25,15 @@ def _proxy(*args, **kwargs):
 
     return (resp.content, resp.status_code, headers)
 
+
+@app.route('/offsets/<string:topic>',methods=['GET'])
+def topics_post(topic):
+    app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
+    LOGGER.info(f"payload -{request.is_json} {payload} ")
+    response_data = _KafkaConsumer.get_topic_offsets(topic)
+    response = Response(json.dumps(response_data))
+    return response
+
 @app.route('/topics/<string:topic>',methods=['POST'])
 def topics_post(topic):
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
@@ -52,6 +61,8 @@ logging.basicConfig(level=logging.INFO)
 APP_CONFIG = config_manager.get_config()
 
 _KafkaProducer = kafka_client.KafkaProducer(APP_CONFIG['kafka_config'])
+_KafkaConsumer = kafka_client.KafkaConsumer(APP_CONFIG['kafka_config'])
+
 rest_url_base = APP_CONFIG['rest_proxy']['url']
 
 
