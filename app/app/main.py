@@ -62,7 +62,7 @@ def topics_post(topic):
       response = Response(result_text, status_code, {"content-type":"application/json"})
 
     headers ={"content-type":"application/vnd.kafka.v1+json"}    
-    response = Response(result_text, status_code, headers)
+    response = Response(result_text, 200, headers)
     return response
     
 @app.route('/', defaults={'path': ''})
