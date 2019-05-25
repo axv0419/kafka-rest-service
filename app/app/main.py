@@ -37,7 +37,8 @@ def topic_offsets(topic):
 
 @app.route('/topics/<string:topic>',methods=['POST'])
 def topics_post(topic):
-    app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
+    LOGGER.info(f'request - {request.remote_addr} {request.method} {request.path}')
+    LOGGER.info(f'Content Type {request.content_type} ')
     if request.content_type != 'application/vnd.kafka.json.v1+json':
       content,status_code,headers = _proxy()
       response = Response(content, status_code, headers)
