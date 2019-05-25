@@ -38,13 +38,30 @@ def topic_offsets(topic):
 @app.route('/topics/<string:topic>',methods=['POST'])
 def topics_post(topic):
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
+    if request.content_type != 'application/vnd.kafka.json.v1+json':
+      content,status_code,headers = _proxy()
+      response = Response(content, status_code, headers)
+      return response
+
     request.on_json_loading_failed = lambda e: ({"error":f"Request data is not good JSON - {e}"})
     payload = request.get_json()
+    if payload.get('error',None):
+      content,status_code,headers = json.dumps(payload),400,{}
+      response = Response(content, status_code, headers)
+      return response
+
     LOGGER.info(f"payload -{request.is_json} {payload} ")
+
     records = payload['records']
-    headers = dict(remote_ip=request.remote_addr)
-    responses = _KafkaProducer.send_records(topic,records,headers)
-    response = Response(json.dumps(responses))
+    record_headers = dict(remote_ip=request.remote_addr)
+    error,result = _KafkaProducer.send_records(topic,records,record_headers)
+    result_text = json.dumps(result)
+    if error:
+      status_code = 400 if error == 'TOPIC_NOT_FOUND' else 500
+      response = Response(result_text, status_code, {"content-type":"application/json"})
+
+    headers ={"content-type":"application/vnd.kafka.v1+json"}    
+    response = Response(result_text, status_code, headers)
     return response
     
 @app.route('/', defaults={'path': ''})
@@ -52,7 +69,6 @@ def topics_post(topic):
 def proxy(path):
     app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
     content,status_code,headers = _proxy()
-    print(content,status_code,headers)
     response = Response(content, status_code, headers)
     return response
 

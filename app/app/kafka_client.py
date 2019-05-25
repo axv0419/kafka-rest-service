@@ -73,22 +73,17 @@ class KafkaProducer:
                 LOGGER.info('Message delivered {} {} {} [{}] {}'.format( msg.timestamp(),msg.offset(), msg.topic(), msg.partition(), msg.key()))
 
             keystr = None if err or not msg.key() else msg.key().decode('UTF-8') 
-            response=dict(
-                error = f"{err}" if err else None, 
-                status = "PRODUCER_ERROR" if err else "SUCCESS",
+            if not err:
                 report=dict(timestamp=msg.timestamp()[1],partition=msg.partition(),\
-                    offset=msg.offset(),key=keystr))
-            responses.append(response)
+                    offset=msg.offset(),key=keystr)
+            else:
+                report=dict(error = f"{err}",status="PRODUCER_ERROR")
+            responses.append(report)
 
         partition_count = self.get_topic_partition_count(topic)
         if not partition_count:
             LOGGER.warn(f"Requested topic {topic} does not exist")
-            responses = [dict(
-                error = f"Topic {topic} does not exist", 
-                status = "PRODUCER_ERROR",
-                report= None)]
-            return responses
-
+            return "TOPIC_NOT_FOUND",dict(reason=f"Topic {topic} not found or not accessible to current user")
 
         LOGGER.info(f"sending records - {records}")
 
@@ -109,7 +104,9 @@ class KafkaProducer:
             self.producer.poll(.01)
         self.producer.flush()
         LOGGER.info(f"Responses - {responses}")
-        return responses
+        retval = {"key_schema_id": null,"value_schema_id": null,"offsets": responses}
+
+        return None, responses
 
 if __name__ == '__main__':
     _KP = KafkaProducer({'bootstrap.servers':'libra:9092'})
