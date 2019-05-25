@@ -2,5 +2,6 @@ requests
 pyyaml
 confluent_kafka
 flask
+flask-cors
 gunicorn
 cachetools

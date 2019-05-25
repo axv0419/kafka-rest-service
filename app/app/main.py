@@ -3,10 +3,12 @@ import requests
 import json
 import sys
 import logging
+from flask_cors import CORS
 
 from . import kafka_client,config_manager
 
 application = app = Flask(__name__)
+CORS(app)
 
 LOGGER = logging.getLogger(__file__)
 
