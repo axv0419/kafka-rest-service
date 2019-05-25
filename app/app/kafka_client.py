@@ -104,7 +104,7 @@ class KafkaProducer:
             self.producer.poll(.01)
         self.producer.flush()
         LOGGER.info(f"Responses - {responses}")
-        retval = {"key_schema_id": null,"value_schema_id": null,"offsets": responses}
+        retval = {"key_schema_id": None,"value_schema_id": None,"offsets": responses}
 
         return None, responses
 
