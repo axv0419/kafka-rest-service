@@ -13,6 +13,8 @@ import traceback
 import logging
 from datetime import datetime, timedelta
 
+from cachetools import cached, LRUCache, TTLCache
+
 
 LOGGER = logging.getLogger(__file__)
 
@@ -21,6 +23,7 @@ class KafkaConsumer:
         conf = dict(conf)
         conf['group.id'] = group_id
         self.consumer = Consumer(conf)
+    @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_partition_count(self,topic_name):
         cmd = self.consumer.list_topics(topic_name)
         tmd = cmd.topics.get(topic_name,None)
@@ -28,6 +31,7 @@ class KafkaConsumer:
         if tmd:
             pcount = len(tmd.partitions)
         return pcount
+    @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_offsets(self,topic_name):
         # timestamp = (datetime.now() - timedelta(minutes=minutes)).timestamp()
         # timestamp = int(timestamp)*1000
