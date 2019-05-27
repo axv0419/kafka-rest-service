@@ -38,7 +38,7 @@ class KafkaConsumer:
                 status="ERROR",
                 report=None)
 
-         rval = collections.defaultdict(list)
+        rval = collections.defaultdict(list)
         for p in range(pcount):
             l,h = self.consumer.get_watermark_offsets(TopicPartition(topic_name,p))
             rval[p].append(h)
