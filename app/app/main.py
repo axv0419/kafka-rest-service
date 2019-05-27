@@ -12,7 +12,7 @@ from . import kafka_client,config_manager
 
 
 STATIC_FOLDER = os.path.abspath(os.environ.get('STATIC_FOLDER','/static'))
-application = app = Flask(__name__,static_folder=STATIC_FOLDER,static_url_path='/static')
+application = app = Flask(__name__,static_folder=STATIC_FOLDER,static_url_path='/static/')
 CORS(app)
 
 LOGGER = logging.getLogger(__file__)
@@ -78,16 +78,6 @@ def topics_post(topic):
   content,status_code,headers = _proxy()
   response = Response(content, status_code, headers)
   return response
-
-
-# @app.route('/static', defaults=dict(filename=None))
-# @app.route('/static/', defaults=dict(filename=None))
-# @app.route('/static/<path:filename>', methods=['GET'])
-# def index(filename):
-#   LOGGER.info(f'request - {request.remote_addr} {request.method} {request.path}')
-#   filename = filename or 'index.html'
-#   if request.method == 'GET':
-#     return send_from_directory(STATIC_FOLDER, filename)
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
