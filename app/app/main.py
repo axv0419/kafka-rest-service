@@ -12,7 +12,7 @@ from . import kafka_client,config_manager
 
 
 STATIC_FOLDER = os.path.abspath(os.environ.get('STATIC_FOLDER','/static'))
-application = app = Flask(__name__,static_folder=STATIC_FOLDER,static_url_path='/static/')
+application = app = Flask(__name__,static_folder=STATIC_FOLDER,static_url_path='/static')
 CORS(app)
 
 LOGGER = logging.getLogger(__file__)
