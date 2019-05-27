@@ -1,4 +1,5 @@
-from flask import Flask,request, Response
+from flask import Flask,request, Response, send_from_directory
+
 import requests
 import json
 import sys
@@ -7,9 +8,7 @@ from flask_cors import CORS
 
 from . import kafka_client,config_manager
 
-application = app = Flask(__name__,
-            static_url_path='/static', 
-            static_folder='/static',)
+application = app = Flask(__name__)
 CORS(app)
 
 
@@ -77,7 +76,15 @@ def topics_post(topic):
   response = Response(content, status_code, headers)
   return response
 
-    
+
+@app.route('/static', defaults=dict(filename=None))
+@app.route('/static/', defaults=dict(filename=None))
+@app.route('/static/<path:filename>', methods=['GET'])
+def index(filename):
+    filename = filename or 'index.html'
+    if request.method == 'GET':
+        return send_from_directory('/static', filename)
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def proxy(path):
