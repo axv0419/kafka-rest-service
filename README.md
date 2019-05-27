@@ -13,6 +13,7 @@ docker run --rm  \
     -e CCLOUD_API_KEY=$CCLOUD_API_KEY \
     -e CCLOUD_API_SECRET=$CCLOUD_API_SECRET \
     -v $(pwd)/app:/app \
+    -v $(pwd)/static:/static \
     -v $(pwd)/appcfg:/appcfg \
     -p 7080:80 \
     kafka/rest-service

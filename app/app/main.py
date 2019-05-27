@@ -7,8 +7,11 @@ from flask_cors import CORS
 
 from . import kafka_client,config_manager
 
-application = app = Flask(__name__)
+application = app = Flask(__name__,
+            static_url_path='_util', 
+            static_folder='/static',)
 CORS(app)
+
 
 LOGGER = logging.getLogger(__file__)
 
@@ -26,15 +29,6 @@ def _proxy(*args, **kwargs):
               if name.lower() not in excluded_headers]
 
   return (resp.content, resp.status_code, headers)
-
-
-@app.route('/offsets/<string:topic>',methods=['GET'])
-def topic_offsets(topic):
-  app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
-  response_data = _KafkaConsumer.get_topic_offsets(topic)
-  response = Response(json.dumps(response_data))
-  return response
-
 
 def send_direct(topic):
   LOGGER.info(f'send_direct - {request.remote_addr} {request.method} {request.path}')
@@ -58,6 +52,17 @@ def send_direct(topic):
   headers ={"content-type":"application/vnd.kafka.v1+json"}    
   response = Response(result_text, 200, headers)
   return response
+
+
+
+@app.route('/offsets/<string:topic>',methods=['GET'])
+def topic_offsets(topic):
+  app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
+  response_data = _KafkaConsumer.get_topic_offsets(topic)
+  response = Response(json.dumps(response_data))
+  return response
+
+
 
 @app.route('/topics/<string:topic>',methods=['POST'])
 def topics_post(topic):
