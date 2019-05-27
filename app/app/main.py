@@ -1,9 +1,11 @@
-from flask import Flask,request, Response, send_from_directory
+import sys
+import os
 
 import requests
 import json
-import sys
 import logging
+
+from flask import Flask,request, Response, send_from_directory
 from flask_cors import CORS
 
 from . import kafka_client,config_manager
@@ -11,7 +13,7 @@ from . import kafka_client,config_manager
 application = app = Flask(__name__)
 CORS(app)
 
-
+STATIC_FOLDER = os.path.abspath(os.environ.get('STATIC_FOLDER','/static'))
 LOGGER = logging.getLogger(__file__)
 
 def _proxy(*args, **kwargs):
@@ -81,9 +83,10 @@ def topics_post(topic):
 @app.route('/static/', defaults=dict(filename=None))
 @app.route('/static/<path:filename>', methods=['GET'])
 def index(filename):
-    filename = filename or 'index.html'
-    if request.method == 'GET':
-        return send_from_directory('/static', filename)
+  LOGGER.info(f'request - {request.remote_addr} {request.method} {request.path}')
+  filename = filename or 'index.html'
+  if request.method == 'GET':
+    return send_from_directory(STATIC_FOLDER, filename)
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
