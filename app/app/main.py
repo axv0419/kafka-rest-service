@@ -8,7 +8,7 @@ from flask_cors import CORS
 from . import kafka_client,config_manager
 
 application = app = Flask(__name__,
-            static_url_path='_util', 
+            static_url_path='/_util', 
             static_folder='/static',)
 CORS(app)
 
