@@ -37,24 +37,28 @@ class KafkaConsumer:
                 error=f"Requested topic {topic_name} not found", 
                 status="ERROR",
                 report=None)
-        rval = collections.defaultdict(list)
+
+         rval = collections.defaultdict(list)
         for p in range(pcount):
             l,h = self.consumer.get_watermark_offsets(TopicPartition(topic_name,p))
             rval[p].append(h)
+
         def get_minute_report(minute):
             timestamp = (datetime.now() - timedelta(minutes=minute)).timestamp()
             timestamp = int(timestamp)*1000
             partitions = [ TopicPartition(topic_name,p,timestamp) for p in range(pcount)]
             partitions = self.consumer.offsets_for_times(partitions)
             for par in partitions:
-                rval[par.partition] = par.offset+1
+                o = par.offset+1
+                rval[par.partition].append(o)
 
         get_minute_report(60*24*7)
         get_minute_report(60*24)
         get_minute_report(60)
         get_minute_report(10)
         get_minute_report(1)
-
+                
+        rval = {k:list(v) for k,v in rval.items()}
         return dict(
             error=None, 
             status="SUCCESS",
