@@ -10,10 +10,11 @@ from flask_cors import CORS
 
 from . import kafka_client,config_manager
 
-application = app = Flask(__name__)
+
+STATIC_FOLDER = os.path.abspath(os.environ.get('STATIC_FOLDER','/static'))
+application = app = Flask(__name__,static_folder=STATIC_FOLDER)
 CORS(app)
 
-# STATIC_FOLDER = os.path.abspath(os.environ.get('STATIC_FOLDER','/static'))
 LOGGER = logging.getLogger(__file__)
 
 def _proxy(*args, **kwargs):
