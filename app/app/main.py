@@ -36,7 +36,7 @@ def topic_offsets(topic):
   return response
 
 
-def send_direct():
+def send_direct(topic):
   LOGGER.info(f'send_direct - {request.remote_addr} {request.method} {request.path}')
   request.on_json_loading_failed = lambda e: ({"error":f"Request data is not good JSON - {e}"})
   payload = request.get_json()
@@ -66,7 +66,7 @@ def topics_post(topic):
   
   if ( request.content_type.split(';')[0] in ['application/vnd.kafka.json.v1+json','application/json']) \
     or request.headers.get('s-client-type',None) == 'vue' :
-    return send_direct()
+    return send_direct(topic)
 
   content,status_code,headers = _proxy()
   response = Response(content, status_code, headers)
