@@ -5,13 +5,19 @@ services:
     build: ./kafka-rest-service
     hostname: kafka-rest-service
     container_name: kafka-rest-service
+    entrypoint:
+    - gunicorn
+    - -b 0.0.0.0:80
+    - --workers=8
+    - app.main
     ports:
-      - 8080:80
+      - 8082:80
     volumes:
       - ./kafka-rest-service/appcfg:/appcfg
       - ./kafka-rest-service/app:/app
+      - ./kafka-rest-service/static:/static
     environment:
       CCLOUD_BROKER_URL: $CCLOUD_BROKER_URL
       CCLOUD_API_KEY: $CCLOUD_API_KEY
       CCLOUD_API_SECRET: $CCLOUD_API_SECRET
- 
+      KAFKA_REST_PROXY_URL: "http://rest-proxy:8082"

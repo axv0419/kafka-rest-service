@@ -15,6 +15,7 @@ docker run --rm  \
     -v $(pwd)/app:/app \
     -v $(pwd)/static:/static \
     -v $(pwd)/appcfg:/appcfg \
+    --entrypoint gunicorn \
     -p 7080:80 \
-    kafka/rest-service
+    kafka/rest-service -b 0.0.0.0:80 --workers=3 app.main
 ```

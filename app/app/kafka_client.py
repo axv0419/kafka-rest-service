@@ -3,6 +3,7 @@ import time
 import sys
 import yaml
 import json
+import collections
 
 from confluent_kafka import Producer,Consumer,KafkaError,TopicPartition
 
@@ -12,7 +13,6 @@ import traceback
 import logging
 from datetime import datetime, timedelta
 
-from cachetools import cached, LRUCache, TTLCache
 
 LOGGER = logging.getLogger(__file__)
 
@@ -21,7 +21,6 @@ class KafkaConsumer:
         conf = dict(conf)
         conf['group.id'] = group_id
         self.consumer = Consumer(conf)
-    @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_partition_count(self,topic_name):
         cmd = self.consumer.list_topics(topic_name)
         tmd = cmd.topics.get(topic_name,None)
@@ -29,9 +28,7 @@ class KafkaConsumer:
         if tmd:
             pcount = len(tmd.partitions)
         return pcount
-
-    @cached(cache=TTLCache(maxsize=1024, ttl=10))
-    def get_topic_offsets(self,topic_name,minutes=10):
+    def get_topic_offsets(self,topic_name):
         # timestamp = (datetime.now() - timedelta(minutes=minutes)).timestamp()
         # timestamp = int(timestamp)*1000
         pcount = self.get_topic_partition_count(topic_name)
@@ -40,13 +37,28 @@ class KafkaConsumer:
                 error=f"Requested topic {topic_name} not found", 
                 status="ERROR",
                 report=None)
-        rval =[]
+        rval = collections.defaultdict(list)
         for p in range(pcount):
             l,h = self.consumer.get_watermark_offsets(TopicPartition(topic_name,p))
-            rval.append(dict(partition=p,committed_offset=h,topic=topic_name))
+            rval[p].append(h)
+        def get_minute_report(minute):
+            timestamp = (datetime.now() - timedelta(minutes=minute)).timestamp()
+            timestamp = int(timestamp)*1000
+            partitions = [ TopicPartition(topic_name,p,timestamp) for p in range(pcount)]
+            partitions = self.consumer.offsets_for_times(partitions)
+            for par in partitions:
+                rval[par.partition] = par.offset+1
+
+        get_minute_report(60*24*7)
+        get_minute_report(60*24)
+        get_minute_report(60)
+        get_minute_report(10)
+        get_minute_report(1)
+
         return dict(
             error=None, 
             status="SUCCESS",
+            topic=topic_name,
             offsets=rval)
 
 class KafkaProducer:
