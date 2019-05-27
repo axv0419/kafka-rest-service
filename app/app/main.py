@@ -64,7 +64,7 @@ def topics_post(topic):
   LOGGER.info(f'request - {request.remote_addr} {request.method} {request.path}')
   LOGGER.info(f'Content Type {request.content_type} ')
   
-  if request.content_type.split(';')[0] in  ['application/vnd.kafka.json.v1+json','application/json']
+  if ( request.content_type.split(';')[0] in ['application/vnd.kafka.json.v1+json','application/json']) \
     or request.headers.get('s-client-type',None) == 'vue' :
     return send_direct()
 
