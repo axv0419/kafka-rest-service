@@ -31,7 +31,7 @@ class KafkaConsumer:
         if tmd:
             pcount = len(tmd.partitions)
         return pcount
-    @cached(cache=TTLCache(maxsize=1024, ttl=60))
+    # @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_offsets(self,topic_name):
         pcount = self.get_topic_partition_count(topic_name)
         if pcount == 0:
