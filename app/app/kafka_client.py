@@ -58,7 +58,7 @@ class KafkaConsumer:
         get_minute_report(60*24,'1 day')
         get_minute_report(60, '1 hour')
         get_minute_report(10, '10 minutes')
-        get_minute_report(1 '1 minute')
+        get_minute_report(1 ,'1 minute')
                 
         part_status_map = {k:list(v) for k,v in part_status_map.items()}
         return dict(
