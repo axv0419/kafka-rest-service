@@ -33,8 +33,6 @@ class KafkaConsumer:
         return pcount
     @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_offsets(self,topic_name):
-        # timestamp = (datetime.now() - timedelta(minutes=minutes)).timestamp()
-        # timestamp = int(timestamp)*1000
         pcount = self.get_topic_partition_count(topic_name)
         if pcount == 0:
             return dict(
@@ -42,32 +40,32 @@ class KafkaConsumer:
                 status="ERROR",
                 report=None)
 
-        rval = collections.defaultdict(list)
+        part_status_map = {}
         for p in range(pcount):
             l,h = self.consumer.get_watermark_offsets(TopicPartition(topic_name,p))
-            rval[p].append(h)
+            part_status_map[p]=[h,'1 month']
 
-        # def get_minute_report(minute):
-        #     timestamp = (datetime.now() - timedelta(minutes=minute)).timestamp()
-        #     timestamp = int(timestamp)*1000
-        #     partitions = [ TopicPartition(topic_name,p,timestamp) for p in range(pcount)]
-        #     partitions = self.consumer.offsets_for_times(partitions)
-        #     for par in partitions:
-        #         o = 0 if par.offset == -1 else rval[par.partition][0]
-        #         rval[par.partition].append(o)
+        def get_minute_report(minute,time_text):
+            timestamp = (datetime.now() - timedelta(minutes=minute)).timestamp()
+            timestamp = int(timestamp)*1000
+            partitions = [ TopicPartition(topic_name,p,timestamp) for p in range(pcount)]
+            partitions = self.consumer.offsets_for_times(partitions)
+            for par in partitions:
+                if par.offset > -1 : 
+                    part_status_map[par.partition][-1] = time_text
 
-        # get_minute_report(60*24*7)
-        # get_minute_report(60*24)
-        # get_minute_report(60)
-        # get_minute_report(10)
-        # get_minute_report(1)
+        get_minute_report(60*24*7,'1 week')
+        get_minute_report(60*24,'1 day')
+        get_minute_report(60, '1 hour')
+        get_minute_report(10, '10 minutes')
+        get_minute_report(1 '1 minute')
                 
-        rval = {k:list(v) for k,v in rval.items()}
+        part_status_map = {k:list(v) for k,v in part_status_map.items()}
         return dict(
             error=None, 
             status="SUCCESS",
             topic=topic_name,
-            offsets=rval)
+            offsets=part_status_map)
 
 class KafkaProducer:
     def __init__(self,conf):
