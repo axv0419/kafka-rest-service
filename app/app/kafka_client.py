@@ -53,7 +53,7 @@ class KafkaConsumer:
             partitions = [ TopicPartition(topic_name,p,timestamp) for p in range(pcount)]
             partitions = self.consumer.offsets_for_times(partitions)
             for par in partitions:
-                o = par.offset+1
+                o = 0 if par.offset == -1 else rval[par.partition][0]
                 rval[par.partition].append(o)
 
         get_minute_report(60*24*7)
