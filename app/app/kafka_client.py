@@ -5,7 +5,7 @@ import yaml
 import json
 import collections
 
-from confluent_kafka import Producer,Consumer,KafkaError,TopicPartition,AdminClient
+from confluent_kafka import Producer,Consumer,KafkaError,TopicPartition
 
 from collections import defaultdict
 import argparse
@@ -74,7 +74,6 @@ class KafkaConsumer:
 class KafkaProducer:
     def __init__(self,conf):
         self.producer = Producer(conf)
-        self.admin_client = AdminClient(conf)
 
     def get_topic_list(self,showInternal=True):
         cmd = self.producer.list_topics()
