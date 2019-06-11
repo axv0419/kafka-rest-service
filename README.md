@@ -2,7 +2,7 @@
 
 
 ```bash
-docker build -t kafka/rest-service .
+docker build -t d3x/kafka-rest-service .
 ```
 
 
@@ -17,5 +17,5 @@ docker run --rm  \
     -v $(pwd)/appcfg:/appcfg \
     --entrypoint gunicorn \
     -p 7080:80 \
-    kafka/rest-service -b 0.0.0.0:80 --workers=3 app.main
+    d3x/kafka-rest-service -b 0.0.0.0:80 --workers=3 app.main
 ```
