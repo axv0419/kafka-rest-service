@@ -5,7 +5,7 @@ import requests
 import json
 import logging
 
-from flask import Flask,request, Response, send_from_directory
+from flask import Flask,request, Response, send_from_directory,jsonify,redirect
 from flask_cors import CORS
 
 from . import kafka_client,config_manager
@@ -55,7 +55,9 @@ def send_direct(topic):
   response = Response(result_text, 200, headers)
   return response
 
-
+@app.route('/healthz',methods=['GET'])
+def healthz(topic):
+  return jsonify(dict(status="up"))
 
 @app.route('/offsets/<string:topic>',methods=['GET'])
 def topic_offsets(topic):
@@ -99,6 +101,9 @@ def topics_post(topic):
 @app.route('/<path:path>')
 def proxy(path):
   app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
+  if path == '' and 'html' in request.headers.get('Accept',None): 
+    return redirect('/static/index.html')
+
   content,status_code,headers = _proxy()
   response = Response(content, status_code, headers)
   return response
