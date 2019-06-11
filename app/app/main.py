@@ -84,7 +84,7 @@ def topics_list():
   return response
 
 @app.route('/topics/<string:topic>',methods=['GET'])
-def topics_post(topic):
+def topic_partitions(topic):
   LOGGER.info(f'request - {request.remote_addr} {request.method} {request.path}')
   LOGGER.info(f'Content Type {request.content_type} ')
 
