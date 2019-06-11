@@ -92,7 +92,7 @@ class KafkaProducer:
         partitions = [dict(partition=partition.id,leader=partition.leader,\
             replicas=[{'broker':replica_id,\
                 'leader':replica_id==partition.leader,\
-                'in_sync': replica_id in partitions.isrs} for replica_id in partition.replicas]) for _,partition in tmd.partitions.items()]
+                'in_sync': replica_id in partition.isrs} for replica_id in partition.replicas]) for _,partition in tmd.partitions.items()]
         result = dict(name=tmd.topic,partitions=partitions)
         result['configs'] = {f'k{i}':f'not implemented v{i}' for i in range(5)}
         return None,result
