@@ -83,8 +83,8 @@ class KafkaProducer:
         cmd = self.producer.list_topics(topic_name)
         tmd = cmd.topics.get(topic_name,None)
         if tmd:
-            return None,tmd.partitions
-        return 'TOPIC NOT FOUND',f"{topic_name} not found"
+            return None,dict(name=topic_name,partitions=tmd.partitions)
+        return 'TOPIC_NOT_FOUND',f"{topic_name} not found"
  
     # @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_partition_count(self,topic_name):
