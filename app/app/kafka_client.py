@@ -5,7 +5,7 @@ import yaml
 import json
 import collections
 
-from confluent_kafka import Producer,Consumer,KafkaError,TopicPartition
+from confluent_kafka import Producer,Consumer,KafkaError,TopicPartition,AdminClient
 
 from collections import defaultdict
 import argparse
@@ -18,11 +18,15 @@ from datetime import datetime, timedelta
 
 LOGGER = logging.getLogger(__file__)
 
+
+
+
 class KafkaConsumer:
     def __init__(self,conf,group_id='kafka-rest-service'):
         conf = dict(conf)
         conf['group.id'] = group_id
         self.consumer = Consumer(conf)
+
     # @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_partition_count(self,topic_name):
         cmd = self.consumer.list_topics(topic_name)
@@ -70,6 +74,7 @@ class KafkaConsumer:
 class KafkaProducer:
     def __init__(self,conf):
         self.producer = Producer(conf)
+        self.admin_client = AdminClient(conf)
 
     def get_topic_list(self,showInternal=True):
         cmd = self.producer.list_topics()
@@ -82,11 +87,17 @@ class KafkaProducer:
     def get_topic_partitions(self,topic_name):
         cmd = self.producer.list_topics(topic_name)
         tmd = cmd.topics.get(topic_name,None)
-        if tmd:
-            print(dict(tmd.partitions))
-            return None,dict(name=tmd.topic,partitions=dict(tmd.partitions))
-        return 'TOPIC_NOT_FOUND',f"{topic_name} not found"
- 
+        if not tmd:
+            return 'TOPIC_NOT_FOUND',f"{topic_name} not found"
+
+        partitions = [dict(partition=partition.id,leader=partition.leader,\
+            replicas=[{'broker':replica_id,\
+                'leader':replica_id==partition.leader,\
+                'in_sync': replica_id in partitions.isrs} for replica_id in partition.replicas]) for partition in tmd.partitions]
+        result = dict(name=tmd.topic,partitions=partitions)
+        result['configs'] = {f'k{i}':f'not implemented v{i}' for i in range(5)}
+        return None,result
+
     # @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_partition_count(self,topic_name):
         cmd = self.producer.list_topics(topic_name)
