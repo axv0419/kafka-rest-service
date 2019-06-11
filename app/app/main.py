@@ -65,11 +65,12 @@ def topic_offsets(topic):
   return response
 
 @app.route('/topics',methods=['GET'])
-def topics_list(topic):
+def topics_list():
   LOGGER.info(f'request - {request.remote_addr} {request.method} {request.path}')
   LOGGER.info(f'Content Type {request.content_type} ')
 
-  error,result = _KafkaProducer.get_topic_list(showInternal=request.args.get("show_internal",'TRUE').upper() not in ['FALSE','NO'])
+  error,result = _KafkaProducer.get_topic_list(showInternal=request.args.get("show_internal",'TRUE').upper() \
+    not in ['FALSE','NO'])
   result_text = json.dumps(result)
   if error:
     status_code = 400 if error == 'TOPIC_NOT_FOUND' else 500
