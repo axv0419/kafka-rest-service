@@ -13,7 +13,7 @@ import traceback
 import logging
 from datetime import datetime, timedelta
 
-from cachetools import cached, LRUCache, TTLCache
+# from cachetools import cached, LRUCache, TTLCache
 
 
 LOGGER = logging.getLogger(__file__)
@@ -23,7 +23,7 @@ class KafkaConsumer:
         conf = dict(conf)
         conf['group.id'] = group_id
         self.consumer = Consumer(conf)
-    @cached(cache=TTLCache(maxsize=1024, ttl=60))
+    # @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_partition_count(self,topic_name):
         cmd = self.consumer.list_topics(topic_name)
         tmd = cmd.topics.get(topic_name,None)
@@ -71,7 +71,22 @@ class KafkaProducer:
     def __init__(self,conf):
         self.producer = Producer(conf)
 
-    @cached(cache=TTLCache(maxsize=1024, ttl=60))
+    def get_topic_list(self,showInternal=True):
+        cmd = self.producer.list_topics()
+        tmd = cmd.topics
+        topic_list = list(tmd.keys())
+        if not showInternal:
+            topic_list = [t for t in topic_list if not( t and t[0]=='_')] 
+        return None,topic_list
+ 
+    def get_topic_partitions(self,topic_name):
+        cmd = self.producer.list_topics(topic_name)
+        tmd = cmd.topics.get(topic_name,None)
+        if tmd:
+            return None,tmd.partitions
+        return 'TOPIC NOT FOUND',f"{topic_name} not found"
+ 
+    # @cached(cache=TTLCache(maxsize=1024, ttl=60))
     def get_topic_partition_count(self,topic_name):
         cmd = self.producer.list_topics(topic_name)
         tmd = cmd.topics.get(topic_name,None)
@@ -123,7 +138,6 @@ class KafkaProducer:
         self.producer.flush()
         LOGGER.info(f"Responses - {responses}")
         retval = {"key_schema_id": None,"value_schema_id": None,"offsets": responses}
-
         return None, responses
 
 if __name__ == '__main__':

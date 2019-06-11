@@ -50,7 +50,7 @@ def send_direct(topic):
   if error:
     status_code = 400 if error == 'TOPIC_NOT_FOUND' else 500
     response = Response(result_text, status_code, {"content-type":"application/json"})
-
+    return response
   headers ={"content-type":"application/vnd.kafka.v1+json"}    
   response = Response(result_text, 200, headers)
   return response
@@ -64,6 +64,21 @@ def topic_offsets(topic):
   response = Response(json.dumps(response_data))
   return response
 
+@app.route('/topics',methods=['GET'])
+def topics_list(topic):
+  LOGGER.info(f'request - {request.remote_addr} {request.method} {request.path}')
+  LOGGER.info(f'Content Type {request.content_type} ')
+
+  error,result = _KafkaProducer.get_topic_list(showInternal=request.args.get("show_internal",'TRUE').upper() not in ['FALSE','NO'])
+  result_text = json.dumps(result)
+  if error:
+    status_code = 400 if error == 'TOPIC_NOT_FOUND' else 500
+    response = Response(result_text, status_code, {"content-type":"application/json"})
+    return response
+
+  headers ={"content-type":"application/vnd.kafka.v1+json"}    
+  response = Response(result_text, 200, headers)
+  return response
 
 
 @app.route('/topics/<string:topic>',methods=['POST'])
