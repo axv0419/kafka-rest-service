@@ -83,7 +83,8 @@ class KafkaProducer:
         cmd = self.producer.list_topics(topic_name)
         tmd = cmd.topics.get(topic_name,None)
         if tmd:
-            return None,dict(name=topic_name,partitions=tmd.partitions)
+            print(dict(tmd.partitions))
+            return None,dict(name=tmd.topic,partitions=dict(tmd.partitions))
         return 'TOPIC_NOT_FOUND',f"{topic_name} not found"
  
     # @cached(cache=TTLCache(maxsize=1024, ttl=60))
