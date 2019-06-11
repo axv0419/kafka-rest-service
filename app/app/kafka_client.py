@@ -89,7 +89,7 @@ class KafkaProducer:
         if not tmd:
             return 'TOPIC_NOT_FOUND',f"{topic_name} not found"
 
-        partitions = [dict(partition=partition,leader=partition.leader,\
+        partitions = [dict(partition=partition.id,leader=partition.leader,\
             replicas=[{'broker':replica_id,\
                 'leader':replica_id==partition.leader,\
                 'in_sync': replica_id in partitions.isrs} for replica_id in partition.replicas]) for _,partition in tmd.partitions.items()]
