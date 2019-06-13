@@ -100,7 +100,7 @@ def topic_partitions(topic):
 
 @app.route('/topics/<string:topic>',methods=['POST'])
 def topics_post(topic):
-  app.logger.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type}')
+  app.logger.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type} Content-Length: {request.content_length}')
   if ( request.content_type.split(';')[0] in \
     ['application/vnd.kafka.json.v2+json','application/vnd.kafka.json.v1+json','application/json']) \
       or request.headers.get('s-client-type',None) == 'vue' :
