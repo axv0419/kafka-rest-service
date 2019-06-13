@@ -129,6 +129,10 @@ _KafkaConsumer = kafka_client.KafkaConsumer(APP_CONFIG['kafka_config'])
 
 rest_url_base = APP_CONFIG['rest_proxy']['url']
 
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 if __name__ == '__main__':
   loglevel = os.environ.get('LOG_LEVEL','INFO') == 'DEBUG' and logging.DEBUG or logging.INFO 
