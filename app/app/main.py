@@ -35,13 +35,13 @@ def _proxy(*args, **kwargs):
 def send_direct(topic):
   request.on_json_loading_failed = lambda e: ({"error":f"Request data is not good JSON - {e}"})
   payload = request.get_json()
-  LOGGER.info(f'send_direct payload- {payload}')
+  app.logger.info(f'send_direct payload- {payload}')
   if payload.get('error',None):
     content,status_code,headers = json.dumps(payload),400,{}
     response = Response(content, status_code, headers)
     return response
 
-  LOGGER.info(f"payload -{request.is_json} {payload} ")
+  app.logger.info(f"payload -{request.is_json} {payload} ")
 
   records = payload['records']
   record_headers = dict(remote_ip=request.remote_addr)
@@ -61,14 +61,14 @@ def healthz(topic):
 
 @app.route('/offsets/<string:topic>',methods=['GET'])
 def topic_offsets(topic):
-  app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
+  app.app.logger.info(f'request - {request.remote_addr} {request.method} {request.path}')
   response_data = _KafkaConsumer.get_topic_offsets(topic)
   response = Response(json.dumps(response_data))
   return response
 
 @app.route('/topics',methods=['GET'])
 def topics_list():
-  LOGGER.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type}')
+  app.logger.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type}')
 
   error,result = _KafkaProducer.get_topic_list(showInternal=request.args.get("show_internal",'TRUE').upper() \
     not in ['FALSE','NO'])
@@ -84,7 +84,7 @@ def topics_list():
 
 @app.route('/topics/<string:topic>',methods=['GET'])
 def topic_partitions(topic):
-  LOGGER.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type}')
+  app.logger.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type}')
 
   error,result = _KafkaProducer.get_topic_partitions(topic)
   result_text = json.dumps(result)
@@ -100,7 +100,7 @@ def topic_partitions(topic):
 
 @app.route('/topics/<string:topic>',methods=['POST'])
 def topics_post(topic):
-  LOGGER.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type}')
+  app.logger.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type}')
   if ( request.content_type.split(';')[0] in \
     ['application/vnd.kafka.json.v2+json','application/vnd.kafka.json.v1+json','application/json']) \
       or request.headers.get('s-client-type',None) == 'vue' :
@@ -113,7 +113,7 @@ def topics_post(topic):
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def proxy(path):
-  LOGGER.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type}')
+  app.logger.info(f'request - {request.remote_addr}  {request.method} {request.path} - Content-Type: {request.content_type}')
   if path == '' and 'html' in request.headers.get('Accept',None): 
     return redirect('/static/index.html')
 
@@ -121,8 +121,6 @@ def proxy(path):
   response = Response(content, status_code, headers)
   return response
 
-loglevel = os.environ.get('LOG_LEVEL','INFO') == 'DEBUG' and logging.DEBUG or logging.INFO 
-logging.basicConfig(level=loglevel,format='%(asctime)s - %(levelname)s - %(message)s')
 
 APP_CONFIG = config_manager.get_config()
 
@@ -133,4 +131,6 @@ rest_url_base = APP_CONFIG['rest_proxy']['url']
 
 
 if __name__ == '__main__':
+  loglevel = os.environ.get('LOG_LEVEL','INFO') == 'DEBUG' and logging.DEBUG or logging.INFO 
+  logging.basicConfig(level=loglevel,format='%(asctime)s - %(levelname)s - %(message)s')
   app.run(host="0.0.0.0", debug=True, port=80)
